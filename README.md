@@ -1,3 +1,5 @@
+# 🚀 Accepted at ISMB 2026
+
 # ATTNSOM: Learning Cross-Isoform Attention for Cytochrome P450 Site-of-Metabolism Prediction
 
 This repository contains the reference implementation of **ATTNSOM**, an isoform-aware framework for atom-level site-of-metabolism (SoM) prediction in cytochrome P450–mediated drug metabolism.
