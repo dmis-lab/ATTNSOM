@@ -2,6 +2,11 @@
 
 > 🚀 Accepted at ISMB 2026
 
+[![Paper](https://img.shields.io/badge/Bioinformatics-10.1093%2Fbioinformatics%2Fbtag314-b31b1b)](https://doi.org/10.1093/bioinformatics/btag314)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+
+📄 **Paper:** [ATTNSOM: learning cross-isoform attention for cytochrome P450 site-of-metabolism prediction](https://doi.org/10.1093/bioinformatics/btag314) — *Bioinformatics* 42(Supplement_1), 2026.
+
 Reference implementation of **ATTNSOM**, an isoform-aware framework for atom-level
 site-of-metabolism (SoM) prediction in cytochrome P450–mediated drug metabolism.
 
@@ -228,12 +233,18 @@ envs/attnsom.yaml  conda environment
 
 ## Citation
 
+DOI: [10.1093/bioinformatics/btag314](https://doi.org/10.1093/bioinformatics/btag314)
+
 ```bibtex
 @article{kim2026attnsom,
-  title   = {ATTNSOM: Learning Cross-Isoform Attention for Cytochrome P450 Site-of-Metabolism Prediction},
-  author  = {Kim, Hajung and Lee, Eunha and Chung, Sohyun and Park, Jueon and Baek, Seungheun and Kang, Jaewoo},
-  journal = {Bioinformatics},
-  year    = {2026}
+  title={ATTNSOM: learning cross-isoform attention for cytochrome P450 site-of-metabolism prediction},
+  author={Kim, Hajung and Lee, Eunha and Chung, Sohyun and Park, Jueon and Baek, Seungheun and Kang, Jaewoo},
+  journal={Bioinformatics},
+  volume={42},
+  number={Supplement\_1},
+  pages={btag314},
+  year={2026},
+  publisher={Oxford University Press}
 }
 ```
 
