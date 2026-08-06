@@ -37,6 +37,19 @@ _BOND_STEREOS = [
 ]
 
 
+class MolData(Data):
+    """``Data`` with correct batch offsets for ``rev_edge_index``.
+
+    PyG increments every attribute whose name contains ``index`` by the number
+    of nodes. ``rev_edge_index`` indexes *edges*, so it needs its own rule.
+    """
+
+    def __inc__(self, key, value, *args, **kwargs):
+        if key == 'rev_edge_index':
+            return self.edge_index.size(1)
+        return super().__inc__(key, value, *args, **kwargs)
+
+
 def one_hot(x, choices):
     vec = [0]*len(choices)
     try:
@@ -160,13 +173,25 @@ def bond_features(bond: Chem.rdchem.Bond):
     return f
 
 
-def mol_to_graph(mol, smiles):
+def mol_to_graph(mol, smiles, som_indices=None):
+    """Build a PyG ``Data`` object with atom-level SoM labels.
+
+    Args:
+        mol: RDKit molecule.
+        smiles: canonical SMILES of ``mol``.
+        som_indices: optional list of **0-based** SoM atom indices. When it is
+            ``None`` the labels are read from the ``PRIMARY_SOM`` SD property,
+            which stores **1-based** indices (Zaretzki SDF convention).
+    """
     num_atoms = mol.GetNumAtoms()
 
-    som_idxs = []
-    if mol.HasProp('PRIMARY_SOM'):
+    if som_indices is not None:
+        som_idxs = [int(x) for x in som_indices]
+    elif mol.HasProp('PRIMARY_SOM'):
         primary_som = mol.GetProp('PRIMARY_SOM').strip()
         som_idxs = [int(x)-1 for x in primary_som.split() if x.isdigit()]
+    else:
+        som_idxs = []
     labels = torch.zeros(num_atoms, dtype=torch.float32)
     for idx in som_idxs:
         if 0 <= idx < num_atoms:
@@ -196,13 +221,19 @@ def mol_to_graph(mol, smiles):
         eattr += [bf, bf]
     if len(edges) == 0:
         edge_index = torch.empty(2, 0, dtype=torch.long)
+        rev_edge_index = torch.empty(0, dtype=torch.long)
     else:
         edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+        # Directed edges are appended in (i->j, j->i) pairs, so the reverse of
+        # edge 2k is 2k+1 and vice versa. Needed by the D-MPNN encoder.
+        n_edges = edge_index.size(1)
+        rev_edge_index = torch.arange(n_edges, dtype=torch.long).view(-1, 2).flip(1).reshape(-1)
     edge_attr = torch.tensor(eattr, dtype=torch.float32) if len(eattr) > 0 else \
         torch.zeros((0, len(_BOND_TYPES) + 1 + 2 + len(_BOND_STEREOS)), dtype=torch.float32)
 
-    data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr,
-                y=labels, smiles=smiles, num_atoms=num_atoms)
+    data = MolData(x=x, edge_index=edge_index, edge_attr=edge_attr,
+                   y=labels, smiles=smiles, num_atoms=num_atoms,
+                   rev_edge_index=rev_edge_index)
     return data, som_idxs
 
 

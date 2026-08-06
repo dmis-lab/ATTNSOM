@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+
+# run artifacts
+results/
+checkpoint/
+inference_results/
+figures/
+wandb/
+logs/
+
+.DS_Store
